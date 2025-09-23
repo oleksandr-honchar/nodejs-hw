@@ -4,7 +4,7 @@ import pino from "pino-http";
 import "dotenv/config";
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3030;
 
 // Middleware
 app.use(express.json());
@@ -23,24 +23,29 @@ app.use(
         hideObject: true,
       },
     },
-  })
+  }),
 );
-
-// Логування часу
-app.use((req, res, next) => {
-  console.log(`Time: ${new Date().toLocaleString()}`);
-  next();
-});
 
 // Кореневий маршрут
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello, World!" });
 });
 
+// Всі нотатки
+app.get("/notes", (req, res) => {
+  res.status(200).json({ message: "Retrieved all notes" });
+});
+
+// Одна нотатка за ID
+app.get("/notes/:noteId", (req, res) => {
+  res
+    .status(200)
+    .json({ message: `Retrieved note with ID: ${req.params.noteId}` });
+});
+
 // Маршрут для тестування middleware помилки
-app.get("/test-error", (req, res) => {
-  // Штучна помилка для прикладу
-  throw new Error("Something went wrong");
+app.get("/test-error", () => {
+  throw new Error("Simulated server error"); // штучна помилка
 });
 
 // Middleware 404 (після всіх маршрутів)
@@ -52,17 +57,9 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("Error:", err.message);
   res.status(500).json({
-    message: "Internal Server Error",
+    message: "Simulated server error",
     error: err.message,
   });
-});
-
-// Middleware для парсингу JSON
-app.use(express.json());
-
-app.post("/users", (req, res) => {
-  console.log(req.body); // тепер тіло доступне як JS-об’єкт
-  res.status(201).json({ message: "User created" });
 });
 
 app.listen(PORT, () => {
