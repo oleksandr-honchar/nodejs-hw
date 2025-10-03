@@ -1,5 +1,3 @@
-// src/models/student.js
-
 import { Schema } from 'mongoose';
 import { model } from 'mongoose';
 
@@ -12,7 +10,7 @@ const notesSchema = new Schema(
     },
     content: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       default: '',
     },
@@ -20,9 +18,8 @@ const notesSchema = new Schema(
       type: String,
       required: false,
       enum: [
-        'Personal',
         'Work',
-        'Other',
+        'Personal',
         'Meeting',
         'Shopping',
         'Ideas',

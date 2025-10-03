@@ -1,5 +1,3 @@
-// src/server.js
-
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
@@ -14,15 +12,12 @@ import notesRoutes from './routes/notesRoutes.js';
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
-// глобальні middleware
 app.use(logger);
-app.use(express.json()); // req.body
+app.use(express.json());
 app.use(cors());
 
-// підключаємо групу маршрутів студента
 app.use(notesRoutes);
 
-// 404 і обробник помилок — наприкінці ланцюжка
 app.use(notFoundHandler);
 app.use(errorHandler);
 
