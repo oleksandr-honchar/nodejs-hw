@@ -1,5 +1,4 @@
-import { Schema } from 'mongoose';
-import { model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const notesSchema = new Schema(
   {
@@ -10,13 +9,11 @@ const notesSchema = new Schema(
     },
     content: {
       type: String,
-      required: false,
       trim: true,
       default: '',
     },
     tag: {
       type: String,
-      required: false,
       enum: [
         'Work',
         'Personal',
@@ -37,5 +34,7 @@ const notesSchema = new Schema(
     versionKey: false,
   },
 );
+
+notesSchema.index({ title: 'text', content: 'text' });
 
 export const Note = model('Note', notesSchema);
