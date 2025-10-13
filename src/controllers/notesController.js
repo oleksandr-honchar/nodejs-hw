@@ -1,38 +1,37 @@
 import { Note } from '../models/note.js';
 import createHttpError from 'http-errors';
-import { TAGS } from '../constants/tags.js';
 
 export const getAllNotes = async (req, res, next) => {
-  try {
-    const { tag, search, page = 1, perPage = 10 } = req.query;
-    const filter = {};
+  const { tag, search, page = 1, perPage = 10 } = req.query;
 
-    if (tag && TAGS.includes(tag)) {
-      filter.tag = tag;
-    }
+  const pageNumber = Math.max(parseInt(page, 10), 1);
+  const limit = Math.max(parseInt(perPage, 10), 1);
+  const skip = (pageNumber - 1) * limit;
 
-    if (search) {
-      filter.$text = { $search: search };
-    }
+  let notesQuery = Note.find();
 
-    const pageNumber = Math.max(parseInt(page, 10), 1);
-    const limit = Math.max(parseInt(perPage, 10), 1);
-    const skip = (pageNumber - 1) * limit;
-
-    const totalNotes = await Note.countDocuments(filter);
-    const totalPages = Math.ceil(totalNotes / limit);
-
-    const notes = await Note.find(filter).skip(skip).limit(limit);
-    res.status(200).json({
-      notes,
-      totalNotes,
-      totalPages,
-      page: pageNumber,
-      perPage: limit,
-    });
-  } catch (error) {
-    next(error);
+  if (search) {
+    notesQuery.where({ $text: { $search: search } });
   }
+
+  if (tag) {
+    notesQuery.where({ tag });
+  }
+
+  const [totalItems, notes] = await Promise.all([
+    notesQuery.clone().countDocuments(),
+    notesQuery.skip(skip).limit(limit),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  res.status(200).json({
+    notes,
+    totalItems,
+    totalPages,
+    page: pageNumber,
+    perPage: limit,
+  });
 };
 
 export const getNoteById = async (req, res, next) => {

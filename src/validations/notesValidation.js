@@ -32,7 +32,7 @@ export const createNoteSchema = celebrate({
     content: Joi.string().allow(''),
     tag: Joi.string()
       .valid(...TAGS)
-      .required(),
+      .required(false),
   }),
 });
 
