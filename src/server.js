@@ -18,14 +18,12 @@ app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 
+app.use(authRoutes);
 app.use(notesRoutes);
 
 app.use(notFoundHandler);
 app.use(errors());
 app.use(errorHandler);
-
-app.use(authRoutes);
-app.use(notesRoutes);
 
 await connectMongoDB();
 
